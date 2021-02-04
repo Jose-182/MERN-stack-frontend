@@ -85,8 +85,8 @@ export default class Profile extends Component {
             return (
                 <div className="card" style={{width: '35rem'}}>
                     
-                    {this.state.select==='' ? <div style={{margin:'5px auto',width: '35rem',padding:'20px'}}>
-                        <p>Pick a picture</p>
+                    {this.state.select==='' ? <div style={{padding:'20px'}}>
+                        <span style={{paddingBottom:'10px',display:'block'}}>Pick a profile picture</span>
                         {this.state.img.map(e=>{
                             return(
                                 <img style={{cursor:'pointer'}} key={e} onClick={this.onClickImage} src={"img/"+e} alt="profile" className="rounded mx-auto d-inline-block" width="100" height="70"/>
