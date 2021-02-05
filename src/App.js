@@ -4,7 +4,6 @@ import {BrowserRouter as Router,Route} from 'react-router-dom';
 //Importar estilos
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css';
-
 //Importar componentes
 import CreateNote from './components/CreateNote';
 import Navigation from './components/Navigation';
@@ -12,9 +11,10 @@ import CreateUser from './components/CreateUser';
 import NotesList from './components/NotesList';
 import Login from './components/Login';
 import Profile from './components/Profile';
+
 function App() {
   return (
-    
+    //Creación del router y de las rutas
     <Router>
       
       <Navigation/>

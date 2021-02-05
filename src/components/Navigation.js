@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import {Link} from 'react-router-dom'
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import * as Icon from 'react-bootstrap-icons';
+
+//Creación de la clase para la cabecera
 export default class Navigation extends Component {
     
     
@@ -91,27 +93,21 @@ export default class Navigation extends Component {
                             {this.state.cookieEnabled || sessionStorage.getItem('userName')
                             ?
                             <div>
-                                {this.state.display.display!=='block' && !this.state.margin?
-                                <UncontrolledDropdown>
+                                
+                                <UncontrolledDropdown style={this.state.display.display==='block' && this.state.margin ? {display:'flex',alignContent:'center',justifyContent:'center'}
+                                :{}}>
                                     
-                                    <DropdownToggle nav={true} caret style={{marginTop:'-3px',marginLeft:'30px',display:'block'}}>
+                                    <DropdownToggle nav={true} caret style={this.state.display.display!=='block' && !this.state.margin ? {marginTop:'-3px',marginLeft:'30px',display:'block'}:{}}>
+                                        {JSON.parse(sessionStorage.getItem('userName')).imgProfile !== ''? 
                                         <img className="rounded-circle"  src={"img/"+JSON.parse(sessionStorage.getItem('userName')).imgProfile} alt="" width="45" height="30"/>
+                                        :<Icon.PersonFill/>}
                                     </DropdownToggle>
                                     <DropdownMenu>
                                         <DropdownItem tag={Link} to="/profile" name="personal"><Icon.PersonFill/> Personal info</DropdownItem>
                                         <DropdownItem tag={Link} name="logout" onClick={this.onClick} to="/login"><Icon.BoxArrowInLeft/> Logout</DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>
-                                :
-                                <UncontrolledDropdown style={{marginLeft:'0px',display:'flex',alignContent:'center',justifyContent:'center'}}>
-                                <DropdownToggle nav={true} caret>
-                                    <img className="rounded-circle"  src={"img/"+JSON.parse(sessionStorage.getItem('userName')).imgProfile} alt="" width="45" height="30"/>
-                                </DropdownToggle>
-                                <DropdownMenu>
-                                    <DropdownItem tag={Link} to="/profile" name="personal" onClick={this.onClick}><Icon.PersonFill/> Personal info</DropdownItem>
-                                    <DropdownItem tag={Link} name="logout" onClick={this.onClick} to="/login"><Icon.BoxArrowInLeft/> Logout</DropdownItem>
-                                </DropdownMenu>
-                                </UncontrolledDropdown>}
+                               
                             </div>
                             :
                             <Link name="login" className="nav-link" to="/login" onClick={this.onClick}>Login</Link>}

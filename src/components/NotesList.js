@@ -8,6 +8,7 @@ import {Link,Redirect,Route} from 'react-router-dom';
 //Iconos
 import * as Icon from 'react-bootstrap-icons';
 
+//Creación de la clase para listar las notas
 export default class NoteList extends Component {
     
     state={
@@ -19,15 +20,16 @@ export default class NoteList extends Component {
     }
     componentDidMount(){
         
-       
+        //si existe la cookie con los datos de la sesion la establecemos
         if(document.cookie && !sessionStorage.getItem("userName")){
-            var cookies=document.cookie;
-            var separar=cookies.split('=')
+            let cookies=document.cookie;
+            let separar=cookies.split('=')
             sessionStorage.setItem("userName",separar[1]);
         }
-
+        
         this.getNotes();  
         
+        //Capturamos el id de la nota que queremos ver al detalle
         if(this.props.match.params.id){
             this.setState({
                 _id:this.props.match.params.id,
@@ -38,6 +40,7 @@ export default class NoteList extends Component {
         
         
     }
+    //Pedimos las notas del usuario logueado al servidor
     async getNotes(){
         if(sessionStorage.getItem('userName')){
             const notes=await axios.get("https://note-app182-server.herokuapp.com/api/notes/null/"+JSON.parse(sessionStorage.getItem('userName'))._id||false);
@@ -49,10 +52,12 @@ export default class NoteList extends Component {
         }
         
     }
+    //Petición de borrado de notas al servidor
     async deleteNote(id){
         await axios.delete("https://note-app182-server.herokuapp.com/api/notes/"+id);
         this.getNotes();
     }
+    //Control para ver la nota con toda su descripción
     verMas(){
         
         if(this.state._id===this.props.match.params.id){
@@ -72,14 +77,15 @@ export default class NoteList extends Component {
     }
     
     render(){
-        
+        //Si no existe la sesión ni la cookie mandamos saldran las opciones de registro y login
         if(!sessionStorage.getItem("userName") && !document.cookie){
             return(
                <LogRegis/>
                
             )
         }
-        else if(this.state.notes.length <1 && localStorage.getItem('notes')<1){
+        //si no hay ninguna nota creada por el ususario 
+        else if(localStorage.getItem('notes')<1){
             
             return(
                 
@@ -96,6 +102,7 @@ export default class NoteList extends Component {
             )
             
         }
+        //Si hay alguna nota creada por el usuario las deplegamos
         return (
             
             this.state.notes.map((note)=>{
@@ -122,7 +129,7 @@ export default class NoteList extends Component {
                                 {this.state.minus && this.state._id === note._id ? <Icon.Dash style={{color:note.colorLetter}}/>:<Icon.Plus style={{color:note.colorLetter}}/>}
                             </Link>:false}
                         </div>
-                        {this.state._id === note._id?
+                        {this.state._id === note._id ?
                         <div className="card-body" style={{color:note.colorLetter,minWidth:'300px'}}>
                             <h5 className="card-title">{note.title}</h5>
                             <p className="card-text">{note.description}</p>

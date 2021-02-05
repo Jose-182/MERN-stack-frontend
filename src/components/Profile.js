@@ -3,6 +3,8 @@ import {Redirect} from 'react-router-dom';
 import * as Icon from 'react-bootstrap-icons';
 import axios from 'axios'
 import functions from '../libs/functions'
+
+//Creación de la clase para manejar el perfil del usuario
 export default class Profile extends Component {
     
     state={
@@ -14,7 +16,7 @@ export default class Profile extends Component {
         select:JSON.parse(sessionStorage.getItem('userName')).imgProfile,
         changeImg:false
     }
-
+    
     onChange=(e)=>{
         this.setState({
             [e.target.name]:e.target.value
@@ -36,9 +38,10 @@ export default class Profile extends Component {
         })
         
     }
+    
     onClickImage=(e)=>{
-        var src=e.target.src;
-        var separate=src.split("/");
+        let src=e.target.src;
+        let separate=src.split("/");
         if(JSON.parse(sessionStorage.getItem('userName')).imgProfile!==separate[4]){
             this.setState({
                 select:separate[4],
@@ -55,6 +58,7 @@ export default class Profile extends Component {
             })
         }
     }
+    //Actualizamos los datos modificados por el usuario
     onSubmit= async (e)=>{
         e.preventDefault();
        
@@ -80,7 +84,6 @@ export default class Profile extends Component {
 
     }
     render() {
-        console.log(this.state.select);
         if(sessionStorage.getItem('userName')){
             return (
                 <div className="card" style={{width: '35rem'}}>
@@ -89,13 +92,15 @@ export default class Profile extends Component {
                         <span style={{paddingBottom:'10px',display:'block'}}>Pick a profile picture</span>
                         {this.state.img.map(e=>{
                             return(
-                                <img style={{cursor:'pointer'}} key={e} onClick={this.onClickImage} src={"img/"+e} alt="profile" className="rounded mx-auto d-inline-block" width="100" height="70"/>
-                                
+                                <img style={{cursor:'pointer'}} key={e} onClick={this.onClickImage} src={"img/"+e} 
+                                alt="profile" className="rounded mx-auto d-inline-block" width="100" height="70"/>
                             )
                         })}
-                    </div>:<img style={{position:'relative'}} src={"img/"+this.state.select} alt="profile"/>}
+                    </div>
+                    :<img style={{position:'relative'}} src={"img/"+this.state.select} alt="profile"/>}
                     {!this.state.changeImg && this.state.select!==''?
-                        <button name="editImage" style={{position:'absolute',top:'0',right:"0",border:'none'}} onClick={()=>this.setState({changeImg:true,select:''})} className="btn btn btn-primary">
+                        <button name="editImage" style={{position:'absolute',top:'0',right:"0",border:'none'}} 
+                            onClick={()=>this.setState({changeImg:true,select:''})} className="btn btn btn-primary">
                             <Icon.Pencil/>
                         </button>
                     :false}
@@ -106,9 +111,12 @@ export default class Profile extends Component {
                                 <label htmlFor="username">Username</label>
                                 <div className="input-group mb-3">
                                     
-                                    <input onBlur={()=>this.setState({disabledInput:true})} autoComplete="off" disabled={this.state.disabledInput} name="userName" onChange={this.onChange} type="text" className="form-control" value={this.state.userName}/>
+                                    <input onBlur={()=>this.setState({disabledInput:true})} autoComplete="off" 
+                                        disabled={this.state.disabledInput} name="userName" onChange={this.onChange} type="text" 
+                                        className="form-control" value={this.state.userName}/>
                                     <div className="input-group-append">
-                                        <button name="editName" onClick={this.onClick} className="btn btn-outline-secondary" type="button"><Icon.Pencil/></button>
+                                        <button name="editName" onClick={this.onClick} className="btn btn-outline-secondary" 
+                                        type="button"><Icon.Pencil/></button>
                                     </div>
                                 </div>
                             </div>
