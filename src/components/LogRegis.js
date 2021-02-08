@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom';
 
+//Creamos la clase para el componente de registro o login si no existe una sesión creada
 export default class LogRegis extends Component {
     render() {
         return (

@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
+//inportamos el componente para utilizarlo en el caso de que el usuario no este registrado o logueado
 import LogRegis from '../components/LogRegis';
-
 //Peticiones HTTP
 import axios from 'axios';
 //Rutas
 import {Link,Redirect,Route} from 'react-router-dom';
 //Iconos
 import * as Icon from 'react-bootstrap-icons';
+import functions from '../libs/functions'
 
-//Creación de la clase para listar las notas
+//Creamos la clase para el componente de listar notas
 export default class NoteList extends Component {
     
     state={
@@ -21,11 +22,7 @@ export default class NoteList extends Component {
     componentDidMount(){
         
         //si existe la cookie con los datos de la sesion la establecemos
-        if(document.cookie && !sessionStorage.getItem("userName")){
-            let cookies=document.cookie;
-            let separar=cookies.split('=')
-            sessionStorage.setItem("userName",separar[1]);
-        }
+        functions.establishSession();
         
         this.getNotes();  
         
@@ -85,8 +82,8 @@ export default class NoteList extends Component {
             )
         }
         //si no hay ninguna nota creada por el ususario 
-        else if(localStorage.getItem('notes')<1){
-            
+        else if(this.state.notes.length<1 && localStorage.getItem('notes')<1){
+           
             return(
                 
                 <div className="col-sm-14">
@@ -99,16 +96,16 @@ export default class NoteList extends Component {
                             
                 </div>
                     
-            )
+            ) 
             
         }
         //Si hay alguna nota creada por el usuario las deplegamos
         return (
             
             this.state.notes.map((note)=>{
+                
                 var colorIcons=note.colorLetter==='#FFFFFF'?'dark':'light';
                 
-                    
                 return(
                     
                     <div key={note._id} className="noteMobile card mb-3 ml-3" style={this.state._id===note._id?
@@ -129,15 +126,17 @@ export default class NoteList extends Component {
                                 {this.state.minus && this.state._id === note._id ? <Icon.Dash style={{color:note.colorLetter}}/>:<Icon.Plus style={{color:note.colorLetter}}/>}
                             </Link>:false}
                         </div>
-                        {this.state._id === note._id ?
+                        
+                        {this.state._id === note._id ? 
+                        //Desplegaremos la nota al completo que el ususario decida
                         <div className="card-body" style={{color:note.colorLetter,minWidth:'300px'}}>
                             <h5 className="card-title">{note.title}</h5>
                             <p className="card-text">{note.description}</p>
                             
                         </div>
-                        :
+                        ://Las demas notas que pasen de los caracteres establecidos quedarán colapsadas
                         <div className="card-body" style={{color:note.colorLetter,maxWidth:'300px'}}>
-                            <h5 className="card-title">{note.title}</h5>
+                            <h5 className="card-title">{note.title.length<=27 ? note.title : note.title.substring(0,25)+"..."}</h5>
                             <p className="card-text">{note.description.length<=30 ? note.description : note.description.substring(0,30)+"..."}</p>
                         </div>}
 
@@ -152,8 +151,8 @@ export default class NoteList extends Component {
                             
             })
             
-        )   
-         
+        )  
+        
             
     }
 }

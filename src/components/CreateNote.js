@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
+//importamos el paquete axios para realizar las peticiones AJAX al servidor
 import axios from 'axios'
+//importamos el paquete de rutas para la creación de las mismas
 import {Redirect,Route} from 'react-router-dom'
 
+//Creamos la clase para el componente de creación de notas
 export default class CreateNote extends Component {
     
     state={
-        
+        _idNote:'',
         title:'',
-        id_user:'null',
+        id_user:'',
         description:'',
         color:'#FFFFFF',
         colorLetter:'#FFFFFF',
@@ -16,20 +19,23 @@ export default class CreateNote extends Component {
         
 
     }
+    
     componentDidMount(){
+        //Si el usuario quiere editar la nota capturaremos el id de la misma que nos vendra por la URL.
         if(this.props.match.params.id){
             
             this.getNote(this.props.match.params.id);
             
             this.setState({
                 editing:true,
-                _id:this.props.match.params.id
+                _idNote:this.props.match.params.id
             })
             
         }
-        this.getUsers();
+        
         
     }
+    //Pediremos al servidor que nos devuelva los datos de la nota que se quieren editar
     async getNote(id){
         const note = await axios.get("https://note-app182-server.herokuapp.com/api/notes/"+id);
         
@@ -40,12 +46,7 @@ export default class CreateNote extends Component {
         })
         
     }
-    async getUsers(){
-        const users=await axios.get("https://note-app182-server.herokuapp.com/api/users");
-        this.setState({
-            users:users.data
-        })
-    }
+    //Capturaremos todos los cambios que se vayan haciendo al crear la nota para al final establecer el ultimo valor capturado
     onChange=(e)=>{
         this.setState({
             [e.target.name]:e.target.value
@@ -55,7 +56,7 @@ export default class CreateNote extends Component {
 
     onSubmit=async (e)=>{
         e.preventDefault();
-        
+        //Creamos la nota con los datos que nos a facilitado el usuario
         const note={
             title:this.state.title,
             description:this.state.description,
@@ -63,16 +64,17 @@ export default class CreateNote extends Component {
             color:this.state.color,
             colorLetter:this.state.colorLetter
         }
+        //Si la opcion de editar esta en false crearemos la nota nueva
         if(!this.state.editing){
             
             await axios.post("https://note-app182-server.herokuapp.com/api/notes",note);
         }
+        //En el caso de que editar sea true actualizaremos la nota
         else{
-            await axios.put("https://note-app182-server.herokuapp.com/api/notes/"+this.state._id,note);
+            await axios.put("https://note-app182-server.herokuapp.com/api/notes/"+this.state._idNote,note);
         }
         this.setState({
             title:'',
-            author:'',
             description:'',
             color:'#FFFFFF',
             colorLetter:'#FFFFFF',
@@ -84,7 +86,7 @@ export default class CreateNote extends Component {
     }
 
     render() {
-        
+        //En el caso de que el usuario este logueado podra crear notas
         if(sessionStorage.getItem('userName')){
             return(
                 
@@ -132,6 +134,7 @@ export default class CreateNote extends Component {
                 </div>  
             )
         }
+        //En el caso de no estar logueado sera mandado a la página de inicio
         return(
             <Route exact path={"/create"}>
                <Redirect to="/"/> 

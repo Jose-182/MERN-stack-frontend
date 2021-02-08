@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import axios from 'axios'
+import functions from '../libs/functions';
+import {Link} from 'react-router-dom' 
 
-//import {Redirect,Route} from 'react-router-dom';
-
+//Creamos la clase para el componente de login de usuarios
 export class Login extends Component {
     
     state={
@@ -11,10 +12,12 @@ export class Login extends Component {
         exist:'',
         logout:false,
         message:'',
-        remember:false
+        remember:false,
+        control:0
     }
+
     componentDidMount(){
-        
+        //Si el usuario cierra sesión eleminaremos tanto la sesión como la cookie
         if(sessionStorage.getItem("userName")){
             document.cookie = "userName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
             sessionStorage.removeItem("userName");
@@ -25,30 +28,17 @@ export class Login extends Component {
         }
         
     }
-    setCookie(valor){
-        
-        if(document.cookie===''){
-            
-            var time=Date.now()+2629750000;
-            
-            var timeCovertDate=new Date(time)
-            
-            var dateCovertString=timeCovertDate.toString().substring(0,15);
-            
-            document.cookie = `userName=${valor}; expires=${dateCovertString} 00:00:00 UTC; path=/`
-        }
-    }
     onSubmit=async(e)=>{
         e.preventDefault();
-        
+        //Mandamos al servidor el nombre de ususario y la contraseña para verificar la autenticación
         const users=await axios.post("https://note-app182-server.herokuapp.com/api/users/auth",
         {userName:this.state.userName,password:this.state.pass});
         
+        //En el caso de que no nos llegue un mensaje con algún error creamos la sesión y la cookie, esta ultima si el usuario lo marco
         if(!users.data.message){
             
             if(this.state.remember){
-                this.setCookie(JSON.stringify(users.data));
-                
+                functions.setCookie(JSON.stringify(users.data),'');
             }
             sessionStorage.setItem("userName",JSON.stringify(users.data));
             
@@ -57,15 +47,21 @@ export class Login extends Component {
             });
             window.location="/"
         }
+        /*
+            En el caso de que llegue mensaje de error porque el usuario no sea valido o la contraseña sea incorrecta se le comunica al usuario.
+            Si el usuario falla la contraseña lo controlaremos para darle opción a cambiarla 
+        */
         else{
             this.setState({
                 exist:false,
-                message:users.data.message
+                message:users.data.message,
+                control:this.state.control+1
             })
+            
         }
         
     }
-    
+    //Controlaremos lo que va escribiendo el ususario en los inputs para valirdarlo
     onChange=(e)=>{
         
         if(e.target.name==="remember"){
@@ -105,6 +101,7 @@ export class Login extends Component {
                                     <input name="pass" type="password" className="form-control" value={this.state.pass} onChange={this.onChange}/>
                                 </div>
                                 {this.state.exist===false ? <div className="form-group" style={{color:'#FF0000'}}>{this.state.message}</div>:false}
+                                {this.state.control>3 ? <Link style={{marginBottom:'10px',display:'block'}} to="/">Remember pass?</Link>:false}
                                 <div className="form-group form-check">
                                     
                                     <input name="remember" className="form-check-input" type="checkbox" onChange={this.onChange} value={true}/>

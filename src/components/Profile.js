@@ -7,38 +7,83 @@ import functions from '../libs/functions'
 //Creación de la clase para manejar el perfil del usuario
 export default class Profile extends Component {
     
+    //Definimos el estado con sus propiedades
     state={
-        userName:JSON.parse(sessionStorage.getItem('userName')).userName,
+        userName:'',
         disabledButton:true,
         disabledInput:true,
         change:{},
         img:["cat.jpg","puppy.jpg","sea.jpg","lake.jpg"],
-        select:JSON.parse(sessionStorage.getItem('userName')).imgProfile,
-        changeImg:false
+        select:'',
+        changeImg:false,
+        exist:false,
+        iconExist:''
     }
-    
+    componentDidMount(){
+        functions.establishSession();
+        if(sessionStorage.getItem('userName'))
+        this.setState({
+            userName:JSON.parse(sessionStorage.getItem('userName')).userName,
+            select:JSON.parse(sessionStorage.getItem('userName')).imgProfile
+        })
+    }
+    //Validamos que el nombre de usuario no esta ya registrado
+    async validateUsername(value,name){
+        this.setState({
+            iconExist:''
+        })
+        if(name==="userName" && value.length>3 && value!==JSON.parse(sessionStorage.getItem('userName')).userName){
+            
+            const userNames= await axios.post("https://note-app182-server.herokuapp.com/api/users/auth/userName",{userName:value});
+            
+            if(userNames.data.message==='Username exist'){
+                this.setState({
+                    exist:true,
+                    iconExist:<Icon.PersonXFill style={{color:'#C20B0B',fontSize:'1.2em'}}/>
+                })
+                
+            }
+            else{
+                this.setState({
+                    exist:false,
+                    iconExist:<Icon.PersonCheckFill style={{color:'#0F9162',fontSize:'1.2em'}}/>
+                })
+                
+            }
+            
+        }
+        
+    }
+    //Controlamos que el nombre que introduce el usuario es valido
     onChange=(e)=>{
         this.setState({
             [e.target.name]:e.target.value
         })
-        if(e.target.name==="userName" && e.target.value!==JSON.parse(sessionStorage.getItem('userName')).userName){
-            this.setState({
-                disabledButton:false
-            })
+
+        this.validateUsername(e.target.value,e.target.name);
+        
+        if(e.target.name==="userName"){
+            if(e.target.value===JSON.parse(sessionStorage.getItem('userName')).userName || e.target.value.length<4){
+                this.setState({
+                    disabledButton:true
+                })
+            }    
+            else{
+                this.setState({
+                    disabledButton:false
+                })
+            }
         }
-        else{
-            this.setState({
-                disabledButton:true
-            })
-        }
+        
     }
+    //Activamos el campo input para poder editar el nombre de usuario
     onClick=(e)=>{
         this.setState({
             disabledInput:false
         })
         
     }
-    
+    //Comprobamos que el usuario cambia la imagen de perfil a una diferente para que pueda guardarla
     onClickImage=(e)=>{
         let src=e.target.src;
         let separate=src.split("/");
@@ -76,9 +121,10 @@ export default class Profile extends Component {
             disabledButton:true
         })
         sessionStorage.setItem("userName",JSON.stringify(this.state.change));
-        if(document.cookie){
-            functions.setCookie(JSON.stringify(this.state.change));
-        }
+        
+        
+        functions.setCookie(JSON.stringify(this.state.change),false);
+        
         
         window.location="/profile";
 
@@ -114,13 +160,16 @@ export default class Profile extends Component {
                                     <input onBlur={()=>this.setState({disabledInput:true})} autoComplete="off" 
                                         disabled={this.state.disabledInput} name="userName" onChange={this.onChange} type="text" 
                                         className="form-control" value={this.state.userName}/>
+                                    
                                     <div className="input-group-append">
                                         <button name="editName" onClick={this.onClick} className="btn btn-outline-secondary" 
                                         type="button"><Icon.Pencil/></button>
                                     </div>
+                                    
                                 </div>
+                                <span style={{display:'block'}}>{this.state.exist ? this.state.iconExist:this.state.iconExist}</span>
                             </div>
-                            <button disabled={this.state.disabledButton} type="submit" className="btn btn-primary btn-dark">Save</button>
+                            <button disabled={this.state.exist ? true:this.state.disabledButton} type="submit" className="btn btn-primary btn-dark">Save</button>
                         </form>
                         
                     </div>

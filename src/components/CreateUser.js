@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import {Redirect,Route} from 'react-router-dom'
+//Importamos el paquete de iconos instalado
 import * as Icon from 'react-bootstrap-icons';
 
+//Creamos la clase para el componente de creación de usuarios
 export default class CreateUser extends Component {
-    
+    //Creamos las propiedades para controlarlas con el estado
     state={
         
         userName:'',
@@ -13,13 +15,13 @@ export default class CreateUser extends Component {
         
         messageUser:'',
         messagePass:'',
-        messageConfirmPass:'',
         
         colorMessagePass:'',
         
         exist:false,
         redirect:'',
     }
+    //Vamos a validar que el nombre de usuario no este ya registrado realizando la petición al servidor
     async validateUsername(value,name){
         
         if(name==="userName" && value.length>3){
@@ -39,7 +41,7 @@ export default class CreateUser extends Component {
             
         }
     }
-    
+    //Vamos a validar que el número de caracteres este correcto antes de crear el usuario
     validateCharacter(item,value){
         
         if(item==="pass"){
@@ -65,14 +67,12 @@ export default class CreateUser extends Component {
                 
                 this.setState({
                    messageUser:'four characters needed',
-                   
                    exist:false
                 })
             }
             else{
                 this.setState({
                     messageUser:'',
-                    
                 })
             } 
             
@@ -83,11 +83,7 @@ export default class CreateUser extends Component {
                     confirm:this.state.pass
                 })
             }
-            else{
-                this.setState({
-                   messageConfirmPass:'Incorrect'
-                })
-            }
+            
         }
     }
     onChange=(e)=>{
@@ -103,6 +99,7 @@ export default class CreateUser extends Component {
     
     onSubmit=async (e)=>{
         e.preventDefault();
+        //Una vez esta todo validado procedemos a la creación del usuario
         if(this.state.pass.length>5 && this.state.userName.length>3 && this.state.confirm===this.state.pass && !this.state.exist){
             
             await axios.post('https://note-app182-server.herokuapp.com/api/users',{userName:this.state.userName,password:this.state.pass})
@@ -125,8 +122,6 @@ export default class CreateUser extends Component {
         this.getUsers()
     }
     render() {
-        
-        
         
         return (
             

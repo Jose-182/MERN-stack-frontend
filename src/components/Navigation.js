@@ -1,15 +1,17 @@
 import React, { Component } from 'react'
 import {Link} from 'react-router-dom'
+//Este paquete nos servira para crear un deplegable para mostrar mas opciones
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+//Importamos el paquete de iconos
 import * as Icon from 'react-bootstrap-icons';
 
-//Creación de la clase para la cabecera
+//Creación de la clase para el sistema de navegación de la cabecera
 export default class Navigation extends Component {
     
     
     state={
        
-        display:{
+        style:{
             display:'none'
         },
         cookieEnabled:false,
@@ -17,9 +19,11 @@ export default class Navigation extends Component {
     }
     
     componentDidMount(){
+        //Si existe la cookie de sesión de usuario lo verificamos para cambiar de forma dinamica la barra de navegación
         if(document.cookie!==''){
-            var cookies=document.cookie;
-            var separate=cookies.split(/(=|\s)/);
+            let cookies=document.cookie;
+            
+            let separate=cookies.split(/(=|\s)/);
             
             const user=separate.some(elem=>elem==="userName");
             
@@ -31,22 +35,22 @@ export default class Navigation extends Component {
             
         }
     }
-    
+    //Controlaremos el menu de navegación cuando estemos en un dispositivo de dimensiones tipo mobile
     onClick=(e)=>{
         if(e.target.name !== "boton" && e.target.name !== undefined){
             this.setState({
                 margin:false,
-                display:{
+                style:{
                     display:'none'
                 }
             })
         }
         else{
             
-            if(this.state.display.display==='none'){
+            if(this.state.style.display==='none'){
                 this.setState({
                     margin:true,
-                    display:{
+                    style:{
                         display:'block',
                         textAlign:'center'
                     }
@@ -55,7 +59,7 @@ export default class Navigation extends Component {
             else{
                 this.setState({
                     margin:false,
-                    display:{
+                    style:{
                         display:'none'
                     }
                 })
@@ -73,7 +77,7 @@ export default class Navigation extends Component {
                     <button name="boton" onClick={this.onClick} className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span onClick={this.onClick} className="navbar-toggler-icon"></span>
                     </button>
-                    <div className="collapse navbar-collapse" id="navbarNav" style={this.state.display}>
+                    <div className="collapse navbar-collapse" id="navbarNav" style={this.state.style}>
                         <ul className="navbar-nav ml-auto">
                             <li className="nav-item">
                                 <Link name="notes" className="nav-link" to="/" onClick={this.onClick}>Notes</Link>
@@ -94,10 +98,10 @@ export default class Navigation extends Component {
                             ?
                             <div>
                                 
-                                <UncontrolledDropdown style={this.state.display.display==='block' && this.state.margin ? {display:'flex',alignContent:'center',justifyContent:'center'}
+                                <UncontrolledDropdown style={this.state.style.display==='block' && this.state.margin ? {display:'flex',alignContent:'center',justifyContent:'center'}
                                 :{}}>
                                     
-                                    <DropdownToggle nav={true} caret style={this.state.display.display!=='block' && !this.state.margin ? {marginTop:'-3px',marginLeft:'30px',display:'block'}:{}}>
+                                    <DropdownToggle nav={true} caret style={this.state.style.display!=='block' && !this.state.margin ? {marginTop:'-3px',marginLeft:'30px',display:'block'}:{}}>
                                         {JSON.parse(sessionStorage.getItem('userName')).imgProfile !== ''? 
                                         <img className="rounded-circle"  src={"img/"+JSON.parse(sessionStorage.getItem('userName')).imgProfile} alt="" width="45" height="30"/>
                                         :<Icon.PersonFill/>}
